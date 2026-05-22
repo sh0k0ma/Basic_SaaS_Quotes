@@ -26,12 +26,12 @@ Basic_SaaS/
 
 ## 2. クイックスタート
 
-ビルドツール不要です。`public/` を HTTP で配信してブラウザで開きます。
+ビルドツール不要です。Node.js の簡易サーバーで `public/` を配信してブラウザで開きます。
 
 ```bash
-cd public
-python3 -m http.server 5500
-# → http://localhost:5500
+cd Basic_SaaS
+npm run dev
+# → http://127.0.0.1:5500
 ```
 
 VS Code なら **Live Server** 拡張で `public/index.html` を開くだけでも OK。
