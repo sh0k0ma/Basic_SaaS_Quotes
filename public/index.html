@@ -75,11 +75,23 @@
 
           <div class="action-row">
             <button id="btn-download" type="button" class="btn">PNG をダウンロード</button>
-            <button id="btn-share" type="button" class="btn btn-accent">シェア</button>
+            <button id="btn-share" type="button" class="btn btn-accent">Instagram にシェア</button>
           </div>
 
           <p id="status" class="status" role="status" aria-live="polite"></p>
         </form>
+
+        <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-dialog-title">
+          <div class="share-dialog-panel">
+            <h2 id="share-dialog-title">Instagram に投稿</h2>
+            <p id="share-dialog-message" class="share-dialog-message"></p>
+            <div class="share-dialog-actions">
+              <button id="btn-copy-caption" type="button" class="btn">キャプションをコピー</button>
+              <a class="btn btn-accent" href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram を開く</a>
+              <button id="btn-close-share" type="button" class="btn btn-secondary">閉じる</button>
+            </div>
+          </div>
+        </dialog>
       </div>
     </section>
 

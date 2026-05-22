@@ -166,31 +166,37 @@ function persist(quotes) {
 }
 
 // ============================================================
-// Share: Web Share API + ダウンロード
+// Share: Instagram 向け Web Share API + ダウンロード
 // ============================================================
-async function sharePng(canvas, meta) {
-  const blob = await canvasToBlob(canvas);
-  const file = new File([blob], 'quote.png', { type: 'image/png' });
+let lastShareCaption = '';
 
-  if (
-    typeof navigator !== 'undefined' &&
-    navigator.canShare &&
-    navigator.canShare({ files: [file] })
-  ) {
+async function shareToInstagram(canvas, meta) {
+  const blob = await canvasToBlob(canvas);
+  const file = new File([blob], 'quoteshare-instagram.png', {
+    type: 'image/png',
+    lastModified: Date.now(),
+  });
+  const caption = buildCaption(meta);
+  const copied = await copyText(caption);
+  const canShareFile = typeof navigator !== 'undefined'
+    && typeof navigator.canShare === 'function'
+    && navigator.canShare({ files: [file] });
+
+  if (canShareFile && typeof navigator.share === 'function') {
     try {
       await navigator.share({
         files: [file],
-        title: 'QuoteShare',
-        text: `"${meta.text}" — ${meta.author}`,
+        title: 'QuoteShare Instagram Quote',
+        text: caption,
       });
-      return 'shared';
+      return { status: 'shared', caption, copied };
     } catch (err) {
-      if (err && err.name === 'AbortError') return 'shared';
+      if (err && err.name === 'AbortError') return { status: 'cancelled', caption, copied };
     }
   }
 
-  downloadBlob(blob, 'quote.png');
-  return 'downloaded';
+  downloadBlob(blob, 'quoteshare-instagram.png');
+  return { status: 'downloaded', caption, copied };
 }
 
 async function downloadPng(canvas) {
@@ -209,6 +215,22 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function buildCaption(meta) {
+  const text = meta.text.trim();
+  const author = meta.author.trim() || 'Anonymous';
+  return `"${text}" — ${author}\n\n#QuoteShare #名言`;
+}
+
+async function copyText(text) {
+  if (!navigator.clipboard || !window.isSecureContext) return false;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // ============================================================
 // UI: イベント / ギャラリー
 // ============================================================
@@ -224,6 +246,10 @@ const els = {
   btnSave: $('btn-save'),
   btnDownload: $('btn-download'),
   btnShare: $('btn-share'),
+  shareDialog: $('share-dialog'),
+  shareDialogMessage: $('share-dialog-message'),
+  btnCopyCaption: $('btn-copy-caption'),
+  btnCloseShare: $('btn-close-share'),
   status: $('status'),
   form: $('editor-form'),
   navEditor: $('nav-editor'),
@@ -288,16 +314,43 @@ els.btnDownload.addEventListener('click', async () => {
 
 els.btnShare.addEventListener('click', async () => {
   try {
-    const result = await sharePng(els.canvas, {
+    const result = await shareToInstagram(els.canvas, {
       text: els.text.value,
       author: els.author.value,
     });
-    if (result === 'shared') setStatus('シェアシートを開きました');
-    else setStatus('お使いの環境では Web Share 非対応のため PNG を保存しました。Instagram アプリから投稿してください。');
+    lastShareCaption = result.caption;
+    if (result.status === 'shared') {
+      const copyNote = result.copied ? 'キャプションもコピー済みです。' : '';
+      setStatus(`共有シートを開きました。Instagram を選んで投稿できます。${copyNote}`);
+    } else if (result.status === 'cancelled') {
+      setStatus('共有をキャンセルしました');
+    } else {
+      const copyNote = result.copied ? 'キャプションもコピーしました。' : 'キャプションは下のボタンからコピーできます。';
+      openShareDialog(`画像を保存しました。${copyNote}`);
+      setStatus('Instagram 投稿用の PNG を保存しました');
+    }
   } catch (err) {
     setStatus(`シェア失敗: ${err.message}`, true);
   }
 });
+
+els.btnCopyCaption.addEventListener('click', async () => {
+  const copied = await copyText(lastShareCaption || buildCaption(readForm()));
+  setStatus(copied ? 'キャプションをコピーしました' : 'この環境では自動コピーできません', !copied);
+});
+
+els.btnCloseShare.addEventListener('click', () => {
+  els.shareDialog.close();
+});
+
+function openShareDialog(message) {
+  els.shareDialogMessage.textContent = message;
+  if (typeof els.shareDialog.showModal === 'function') {
+    if (!els.shareDialog.open) els.shareDialog.showModal();
+  } else {
+    els.shareDialog.setAttribute('open', '');
+  }
+}
 
 function showView(name) {
   const isEditor = name === 'editor';
