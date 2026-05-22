@@ -4,6 +4,7 @@ import { extname, join, normalize, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = resolve(fileURLToPath(new URL('../public', import.meta.url)));
+const projectDir = resolve(rootDir, '..');
 const host = process.env.HOST || '127.0.0.1';
 const port = Number(process.env.PORT || 5500);
 
@@ -17,12 +18,22 @@ const mimeTypes = {
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
+  '.md': 'text/markdown; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 };
 
 function resolveRequestPath(url) {
   const parsedUrl = new URL(url, `http://${host}:${port}`);
   const pathname = decodeURIComponent(parsedUrl.pathname);
+
+  if (pathname === '/README.md') {
+    return join(rootDir, 'readme.html');
+  }
+
+  if (pathname === '/README.raw.md') {
+    return join(projectDir, 'README.md');
+  }
+
   const requestedPath = pathname === '/' ? '/index.html' : pathname;
   const filePath = normalize(join(rootDir, requestedPath));
 

@@ -14,12 +14,18 @@
 ```
 Basic_SaaS/
 ├── README.md                # 本ファイル(仕様 + 学習ガイド)
+├── package.json             # npm scripts
+├── scripts/
+│   └── dev-server.mjs       # Node.js 開発サーバー
 └── public/
     ├── index.html           # 画面
+  ├── readme.html          # README 表示ページ
     ├── styles/
-    │   └── style.css        # スタイル(reset + theme)
+  │   ├── style.css        # アプリ用スタイル
+  │   └── readme.css       # README 表示ページ用スタイル
     └── scripts/
-        └── app.js           # 全機能(Canvas / Storage / Share / UI)
+    ├── app.js           # 全機能(Canvas / Storage / Share / UI)
+    └── readme.js        # README 表示ページ用 JavaScript
 ```
 
 ---

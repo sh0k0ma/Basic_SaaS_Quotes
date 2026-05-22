@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="QuoteShare の仕様、学習ガイド、開発手順をまとめたドキュメント" />
+  <title>QuoteShare Docs</title>
+  <link rel="stylesheet" href="/styles/readme.css" />
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true">
+    <span id="reading-progress-bar"></span>
+  </div>
+
+  <header class="doc-header">
+    <a class="brand" href="/" aria-label="QuoteShare アプリへ戻る">
+      <span class="brand-mark">Q</span>
+      <span>QuoteShare</span>
+    </a>
+    <nav class="header-actions" aria-label="ドキュメント操作">
+      <a class="header-link" href="/">アプリを開く</a>
+      <a class="header-link" href="/README.raw.md">Markdown</a>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Dark</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="overview" class="hero doc-section" data-title="概要">
+      <div class="hero-copy">
+        <p class="eyebrow">HTML + CSS + JavaScript</p>
+        <h1>QuoteShare 学習ガイド</h1>
+        <p class="hero-lead">
+          名言を作って Instagram にシェアできる、学習用のシンプルな SaaS です。
+          Canvas、LocalStorage、Web Share API、クラウドの考え方まで一気に触れられます。
+        </p>
+        <div class="hero-actions" aria-label="主要リンク">
+          <a class="button button-primary" href="/">エディタを試す</a>
+          <a class="button button-secondary" href="#quickstart">起動手順を見る</a>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="QuoteShare プレビュー">
+        <canvas id="doc-preview-canvas" width="720" height="720"></canvas>
+        <div class="visual-caption">
+          <span>1080 x 1080 PNG</span>
+          <span>LocalStorage</span>
+          <span>Web Share API</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-strip" aria-label="機能サマリー">
+      <article>
+        <strong>7</strong>
+        <span>MVP 機能</span>
+      </article>
+      <article>
+        <strong>0</strong>
+        <span>外部依存</span>
+      </article>
+      <article>
+        <strong>3</strong>
+        <span>学習ステップ</span>
+      </article>
+      <article>
+        <strong>1</strong>
+        <span>npm コマンド</span>
+      </article>
+    </section>
+
+    <div class="doc-layout">
+      <aside class="toc" aria-label="目次">
+        <label class="search-field">
+          <span>ドキュメント内検索</span>
+          <input id="doc-search" type="search" placeholder="例: Canvas, CORS, Firebase" autocomplete="off" />
+        </label>
+        <p id="search-result" class="search-result" aria-live="polite"></p>
+        <nav>
+          <a href="#overview">概要</a>
+          <a href="#structure">ファイル構成</a>
+          <a href="#quickstart">クイックスタート</a>
+          <a href="#mvp">仕様</a>
+          <a href="#html-css-js">HTML/CSS/JavaScript</a>
+          <a href="#api">外部 API</a>
+          <a href="#cloud">クラウド</a>
+          <a href="#ideas">発展アイデア</a>
+          <a href="#license">ライセンス</a>
+        </nav>
+      </aside>
+
+      <div class="doc-content">
+        <section id="structure" class="doc-section" data-title="ファイル構成">
+          <div class="section-heading">
+            <p class="section-kicker">Project</p>
+            <h2>1. ファイル構成</h2>
+          </div>
+          <p>
+            アプリ本体は <code>public/</code> にまとまっています。開発サーバーは Node.js 標準機能だけで静的ファイルを配信します。
+          </p>
+          <div class="code-block">
+            <pre><code>Basic_SaaS/
+├── README.md
+├── package.json
+├── scripts/
+│   └── dev-server.mjs
+└── public/
+    ├── index.html
+    ├── readme.html
+    ├── styles/
+    │   ├── style.css
+    │   └── readme.css
+    └── scripts/
+        ├── app.js
+        └── readme.js</code></pre>
+          </div>
+        </section>
+
+        <section id="quickstart" class="doc-section" data-title="クイックスタート">
+          <div class="section-heading">
+            <p class="section-kicker">Run</p>
+            <h2>2. クイックスタート</h2>
+          </div>
+          <p>
+            ビルドツールは不要です。次のコマンドで <code>public/</code> を配信して、ブラウザで開きます。
+          </p>
+          <div class="code-block">
+            <pre><code>cd Basic_SaaS
+npm run dev
+# -> http://127.0.0.1:5500</code></pre>
+          </div>
+          <p>
+            VS Code の Live Server 拡張で <code>public/index.html</code> を開く運用もできます。
+          </p>
+        </section>
+
+        <section id="mvp" class="doc-section" data-title="仕様">
+          <div class="section-heading">
+            <p class="section-kicker">MVP</p>
+            <h2>3. 仕様</h2>
+          </div>
+
+          <div class="feature-grid">
+            <article>
+              <span>F-01</span>
+              <h3>名言入力</h3>
+              <p>本文と著者を入力します。</p>
+            </article>
+            <article>
+              <span>F-02</span>
+              <h3>プレビュー</h3>
+              <p>入力に応じて Canvas がリアルタイム更新されます。</p>
+            </article>
+            <article>
+              <span>F-03</span>
+              <h3>デザイン選択</h3>
+              <p>テンプレート、背景色、文字色を選択します。</p>
+            </article>
+            <article>
+              <span>F-04</span>
+              <h3>PNG 書き出し</h3>
+              <p>1080 x 1080 の画像としてダウンロードします。</p>
+            </article>
+            <article>
+              <span>F-05</span>
+              <h3>ローカル保存</h3>
+              <p>LocalStorage に名言を永続化します。</p>
+            </article>
+            <article>
+              <span>F-06</span>
+              <h3>ギャラリー</h3>
+              <p>保存した名言を一覧、編集、削除できます。</p>
+            </article>
+            <article>
+              <span>F-07</span>
+              <h3>シェア</h3>
+              <p>Web Share API に対応し、非対応端末ではダウンロードに切り替えます。</p>
+            </article>
+          </div>
+
+          <h3>受け入れ基準</h3>
+          <ul class="check-list">
+            <li>テキストと著者を入力するとプレビューが即時更新される</li>
+            <li>PNG ダウンロードで 1080 x 1080 画像が保存できる</li>
+            <li>LocalStorage に 10 件以上保存して再表示できる</li>
+            <li>モバイル Chrome / Safari でシェア先に画像を渡せる</li>
+          </ul>
+
+          <h3>データモデル</h3>
+          <p>キー <code>quoteshare.quotes</code> に、次のオブジェクト配列を JSON として保存します。</p>
+          <div class="code-block">
+            <pre><code>{
+  id: string;
+  text: string;
+  author: string;
+  template: 'minimal' | 'serif' | 'bold';
+  bg: string;
+  fg: string;
+  thumbnail: string;
+  createdAt: string;
+  updatedAt: string;
+}</code></pre>
+          </div>
+        </section>
+
+        <section id="html-css-js" class="doc-section" data-title="HTML CSS JavaScript">
+          <div class="section-heading">
+            <p class="section-kicker">Step 1</p>
+            <h2>4.1 HTML / CSS / JavaScript</h2>
+          </div>
+          <div class="learning-grid">
+            <article>
+              <h3>セマンティック HTML</h3>
+              <p><code>header</code>、<code>main</code>、<code>section</code>、<code>footer</code> を使い、画面構造をブラウザと支援技術に伝えます。</p>
+            </article>
+            <article>
+              <h3>CSS カスタムプロパティ + Grid</h3>
+              <p>色、角丸、余白を変数化し、画面幅に応じて 1 カラムと 2 カラムを切り替えます。</p>
+            </article>
+            <article>
+              <h3>Canvas API</h3>
+              <p>背景、装飾、本文、著者を 1080 x 1080 の Canvas に描画し、PNG へ変換します。</p>
+            </article>
+            <article>
+              <h3>LocalStorage</h3>
+              <p>小さな JSON データをブラウザに保存し、再訪問時にもギャラリーを復元します。</p>
+            </article>
+          </div>
+          <div class="code-block">
+            <pre><code>:root { --primary: #6366f1; --radius: 12px; }
+.editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+  gap: 24px;
+}
+@media (max-width: 880px) {
+  .editor-grid { grid-template-columns: 1fr; }
+}</code></pre>
+          </div>
+          <p class="note">
+            ユーザー入力を画面に出すときは <code>innerHTML</code> ではなく <code>textContent</code> を使います。
+          </p>
+        </section>
+
+        <section id="api" class="doc-section" data-title="外部 API">
+          <div class="section-heading">
+            <p class="section-kicker">Step 2</p>
+            <h2>4.2 外部 API を呼び出す</h2>
+          </div>
+          <p>
+            本 MVP は外部 API を使いませんが、SaaS を拡張するなら fetch、HTTP ステータス、CORS、API キー管理の理解が必要です。
+          </p>
+          <div class="code-block">
+            <pre><code>try {
+  const res = await fetch('https://example.com/api/data', {
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  const data = await res.json();
+} catch (err) {
+  console.error(err);
+}</code></pre>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Code</th><th>意味</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>200</td><td>成功</td></tr>
+                <tr><td>400</td><td>リクエスト不正</td></tr>
+                <tr><td>401</td><td>未認証</td></tr>
+                <tr><td>403</td><td>権限なし</td></tr>
+                <tr><td>404</td><td>見つからない</td></tr>
+                <tr><td>429</td><td>レート制限超過</td></tr>
+                <tr><td>500</td><td>サーバーエラー</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <h3>CORS</h3>
+            <p>
+              ブラウザは別オリジンの fetch を制限します。サーバーが <code>Access-Control-Allow-Origin</code> を返さないと JavaScript からレスポンスを読めません。
+            </p>
+          </div>
+          <div class="callout callout-warn">
+            <h3>API キー</h3>
+            <p>
+              ブラウザの JavaScript は誰でも読めます。秘密情報はフロントに置かず、BFF やサーバーレス関数で扱います。
+            </p>
+          </div>
+        </section>
+
+        <section id="cloud" class="doc-section" data-title="クラウド">
+          <div class="section-heading">
+            <p class="section-kicker">Step 3</p>
+            <h2>4.3 クラウド</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>種類</th><th>サービス例</th><th>用途</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>静的ホスティング</td><td>Firebase Hosting / Cloudflare Pages / Vercel</td><td>HTML/CSS/JS を世界配信</td></tr>
+                <tr><td>認証</td><td>Firebase Authentication / Auth0</td><td>Google ログイン等</td></tr>
+                <tr><td>データベース</td><td>Cloud Firestore / Supabase</td><td>クラウド側にデータ保存・同期</td></tr>
+                <tr><td>サーバーレス関数</td><td>Cloud Functions / Cloudflare Workers</td><td>API キーを隠す BFF</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>静的ホスティングの基本フロー</h3>
+          <div class="code-block">
+            <pre><code>npm install -g firebase-tools
+firebase login
+firebase init hosting
+firebase deploy</code></pre>
+          </div>
+          <p>
+            クラウド DB を使う場合は、認証とセキュリティルールを必ずセットで設計します。
+          </p>
+          <div class="code-block">
+            <pre><code>match /users/{uid}/quotes/{doc} {
+  allow read, write: if request.auth != null && request.auth.uid == uid;
+}</code></pre>
+          </div>
+        </section>
+
+        <section id="ideas" class="doc-section" data-title="発展アイデア">
+          <div class="section-heading">
+            <p class="section-kicker">Next</p>
+            <h2>5. 発展アイデア</h2>
+          </div>
+          <ul class="idea-list">
+            <li>Firebase Hosting にデプロイして公開 URL を持つ</li>
+            <li>Google ログインを足してクラウド同期する</li>
+            <li>背景画像を Unsplash API から取得する</li>
+            <li>PWA 化してホーム画面に追加可能にする</li>
+            <li>日本語と英語を切り替える多言語対応を入れる</li>
+          </ul>
+        </section>
+
+        <section id="license" class="doc-section" data-title="ライセンス">
+          <div class="section-heading">
+            <p class="section-kicker">License</p>
+            <h2>6. ライセンス</h2>
+          </div>
+          <p>学習目的の参考実装です。自由に改変・利用してください。</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/scripts/readme.js" defer></script>
+</body>
+</html>
