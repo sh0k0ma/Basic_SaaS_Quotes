@@ -10,15 +10,11 @@
 <body>
   <header class="app-header">
     <h1 class="app-title">QuoteShare</h1>
-    <nav class="app-nav">
-      <button id="nav-editor" class="nav-btn is-active" type="button">エディタ</button>
-      <button id="nav-gallery" class="nav-btn" type="button">ギャラリー</button>
-    </nav>
   </header>
 
   <main class="app-main">
     <!-- ===== エディタ画面 ===== -->
-    <section id="view-editor" class="view is-visible" aria-label="エディタ">
+    <section aria-label="エディタ">
       <div class="editor-grid">
         <!-- プレビュー -->
         <div class="preview-wrap">
@@ -68,26 +64,13 @@
           </label>
 
           <div class="action-row">
-            <button id="btn-save" type="submit" class="btn btn-primary">
-              保存
-            </button>
-          </div>
-
-          <div class="action-row">
-            <button id="btn-download" type="button" class="btn">PNG をダウンロード</button>
+            <button id="btn-download" type="button" class="btn btn-primary">PNG をダウンロード</button>
             <button id="btn-share" type="button" class="btn btn-accent">シェア</button>
           </div>
 
           <p id="status" class="status" role="status" aria-live="polite"></p>
         </form>
       </div>
-    </section>
-
-    <!-- ===== ギャラリー画面 ===== -->
-    <section id="view-gallery" class="view" aria-label="ギャラリー">
-      <h2 class="view-title">保存した名言</h2>
-      <ul id="gallery-list" class="gallery-list" aria-live="polite"></ul>
-      <p id="gallery-empty" class="gallery-empty">まだ保存された名言はありません。</p>
     </section>
   </main>
 

@@ -1,8 +1,7 @@
 // app.js — QuoteShare 全機能を 1 ファイルに集約
 //   - Canvas 描画
-//   - LocalStorage CRUD
 //   - Web Share API / ダウンロード
-//   - UI イベント / ギャラリー
+//   - UI イベント
 
 // ============================================================
 // Canvas: 名言画像を描画する (1080 x 1080)
@@ -121,51 +120,6 @@ function withAlpha(hex, alpha) {
 }
 
 // ============================================================
-// Storage: LocalStorage への CRUD
-// ============================================================
-const STORAGE_KEY = 'quoteshare.quotes';
-
-function listQuotes() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveQuote(quote) {
-  const quotes = listQuotes();
-  const now = new Date().toISOString();
-  if (quote.id) {
-    const idx = quotes.findIndex((q) => q.id === quote.id);
-    if (idx >= 0) {
-      quotes[idx] = { ...quotes[idx], ...quote, updatedAt: now };
-      persist(quotes);
-      return quotes[idx];
-    }
-  }
-  const created = { ...quote, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-  quotes.unshift(created);
-  persist(quotes);
-  return created;
-}
-
-function deleteQuote(id) {
-  persist(listQuotes().filter((q) => q.id !== id));
-}
-
-function getQuote(id) {
-  return listQuotes().find((q) => q.id === id) || null;
-}
-
-function persist(quotes) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
-}
-
-// ============================================================
 // Share: Web Share API + ダウンロード
 // ============================================================
 async function sharePng(canvas, meta) {
@@ -210,7 +164,7 @@ function downloadBlob(blob, filename) {
 }
 
 // ============================================================
-// UI: イベント / ギャラリー
+// UI: イベント
 // ============================================================
 const $ = (id) => document.getElementById(id);
 
@@ -221,20 +175,11 @@ const els = {
   template: $('input-template'),
   bg: $('input-bg'),
   fg: $('input-fg'),
-  btnSave: $('btn-save'),
   btnDownload: $('btn-download'),
   btnShare: $('btn-share'),
   status: $('status'),
   form: $('editor-form'),
-  navEditor: $('nav-editor'),
-  navGallery: $('nav-gallery'),
-  viewEditor: $('view-editor'),
-  viewGallery: $('view-gallery'),
-  galleryList: $('gallery-list'),
-  galleryEmpty: $('gallery-empty'),
 };
-
-let editingId = null;
 
 function readForm() {
   return {
@@ -266,15 +211,6 @@ function setStatus(msg, isError = false) {
 
 els.form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const data = readForm();
-  if (!data.text) {
-    setStatus('本文を入力してください', true);
-    return;
-  }
-  const saved = saveQuote({ id: editingId ?? undefined, ...data, thumbnail: makeThumbnail() });
-  editingId = saved.id;
-  setStatus('保存しました');
-  refreshGallery();
 });
 
 els.btnDownload.addEventListener('click', async () => {
@@ -299,70 +235,4 @@ els.btnShare.addEventListener('click', async () => {
   }
 });
 
-function showView(name) {
-  const isEditor = name === 'editor';
-  els.viewEditor.classList.toggle('is-visible', isEditor);
-  els.viewGallery.classList.toggle('is-visible', !isEditor);
-  els.navEditor.classList.toggle('is-active', isEditor);
-  els.navGallery.classList.toggle('is-active', !isEditor);
-  if (!isEditor) refreshGallery();
-}
-els.navEditor.addEventListener('click', () => showView('editor'));
-els.navGallery.addEventListener('click', () => showView('gallery'));
-
-function makeThumbnail() {
-  const tmp = document.createElement('canvas');
-  tmp.width = 300; tmp.height = 300;
-  tmp.getContext('2d').drawImage(els.canvas, 0, 0, 300, 300);
-  return tmp.toDataURL('image/jpeg', 0.7);
-}
-
-function refreshGallery() {
-  const quotes = listQuotes();
-  els.galleryList.innerHTML = '';
-  els.galleryEmpty.classList.toggle('is-hidden', quotes.length > 0);
-
-  for (const q of quotes) {
-    const li = document.createElement('li');
-    li.className = 'gallery-item';
-    li.innerHTML = `
-      <img alt="" src="${q.thumbnail ?? ''}" />
-      <div class="gallery-item-body">
-        <div class="gallery-item-text"></div>
-        <div class="gallery-item-author"></div>
-        <div class="gallery-item-actions">
-          <button data-act="edit">編集</button>
-          <button data-act="delete" class="danger">削除</button>
-        </div>
-      </div>
-    `;
-    li.querySelector('.gallery-item-text').textContent = q.text;
-    li.querySelector('.gallery-item-author').textContent = `— ${q.author || 'Anonymous'}`;
-    li.querySelector('[data-act="edit"]').addEventListener('click', () => loadQuote(q.id));
-    li.querySelector('[data-act="delete"]').addEventListener('click', () => {
-      if (confirm('この名言を削除しますか?')) {
-        deleteQuote(q.id);
-        if (editingId === q.id) editingId = null;
-        refreshGallery();
-      }
-    });
-    els.galleryList.appendChild(li);
-  }
-}
-
-function loadQuote(id) {
-  const q = getQuote(id);
-  if (!q) return;
-  editingId = q.id;
-  els.text.value = q.text;
-  els.author.value = q.author;
-  els.template.value = q.template;
-  els.bg.value = q.bg;
-  els.fg.value = q.fg;
-  render();
-  showView('editor');
-  setStatus('編集モードで読み込みました');
-}
-
 render();
-refreshGallery();
