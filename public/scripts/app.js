@@ -1,6 +1,6 @@
 // app.js — QuoteShare 全機能を 1 ファイルに集約
 //   - Canvas 描画
-//   - Web Share API / ダウンロード
+//   - PNG ダウンロード
 //   - UI イベント
 
 // ============================================================
@@ -120,33 +120,8 @@ function withAlpha(hex, alpha) {
 }
 
 // ============================================================
-// Share: Web Share API + ダウンロード
+// Download: PNG ダウンロード
 // ============================================================
-async function sharePng(canvas, meta) {
-  const blob = await canvasToBlob(canvas);
-  const file = new File([blob], 'quote.png', { type: 'image/png' });
-
-  if (
-    typeof navigator !== 'undefined' &&
-    navigator.canShare &&
-    navigator.canShare({ files: [file] })
-  ) {
-    try {
-      await navigator.share({
-        files: [file],
-        title: 'QuoteShare',
-        text: `"${meta.text}" — ${meta.author}`,
-      });
-      return 'shared';
-    } catch (err) {
-      if (err && err.name === 'AbortError') return 'shared';
-    }
-  }
-
-  downloadBlob(blob, 'quote.png');
-  return 'downloaded';
-}
-
 async function downloadPng(canvas) {
   const blob = await canvasToBlob(canvas);
   downloadBlob(blob, 'quote.png');
@@ -176,7 +151,6 @@ const els = {
   bg: $('input-bg'),
   fg: $('input-fg'),
   btnDownload: $('btn-download'),
-  btnShare: $('btn-share'),
   status: $('status'),
   form: $('editor-form'),
 };
@@ -219,19 +193,6 @@ els.btnDownload.addEventListener('click', async () => {
     setStatus('PNG をダウンロードしました');
   } catch (err) {
     setStatus(`ダウンロード失敗: ${err.message}`, true);
-  }
-});
-
-els.btnShare.addEventListener('click', async () => {
-  try {
-    const result = await sharePng(els.canvas, {
-      text: els.text.value,
-      author: els.author.value,
-    });
-    if (result === 'shared') setStatus('シェアシートを開きました');
-    else setStatus('お使いの環境では Web Share 非対応のため PNG を保存しました。Instagram アプリから投稿してください。');
-  } catch (err) {
-    setStatus(`シェア失敗: ${err.message}`, true);
   }
 });
 

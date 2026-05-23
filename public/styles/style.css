@@ -17,7 +17,6 @@ ul { list-style: none; }
   --muted: #64748b;
   --primary: #6366f1;
   --primary-fg: #ffffff;
-  --accent: #ec4899;
   --border: #e2e8f0;
   --radius: 12px;
   --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
@@ -128,7 +127,6 @@ body {
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--primary); color: var(--primary-fg); }
 .btn-secondary { background: var(--text); color: var(--bg); }
-.btn-accent { background: var(--accent); color: #fff; }
 
 .status { font-size: 0.85rem; color: var(--muted); min-height: 1.2em; }
 
