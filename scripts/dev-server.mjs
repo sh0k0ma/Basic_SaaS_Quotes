@@ -27,10 +27,6 @@ function resolveRequestPath(url) {
   const pathname = decodeURIComponent(parsedUrl.pathname);
 
   if (pathname === '/README.md') {
-    return join(rootDir, 'readme.html');
-  }
-
-  if (pathname === '/README.raw.md') {
     return join(projectDir, 'README.md');
   }
 

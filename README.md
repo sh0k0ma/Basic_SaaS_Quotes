@@ -19,13 +19,10 @@ Basic_SaaS/
 │   └── dev-server.mjs       # Node.js 開発サーバー
 └── public/
     ├── index.html           # 画面
-  ├── readme.html          # README 表示ページ
     ├── styles/
-  │   ├── style.css        # アプリ用スタイル
-  │   └── readme.css       # README 表示ページ用スタイル
+    │   └── style.css        # アプリ用スタイル
     └── scripts/
-    ├── app.js           # 全機能(Canvas / Storage / Share / UI)
-    └── readme.js        # README 表示ページ用 JavaScript
+        └── app.js           # 全機能(Canvas / Storage / Share / UI)
 ```
 
 ---
