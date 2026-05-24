@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="名言を作成して PNG 画像としてダウンロードできる学習用フロントエンドアプリ" />
-  <title>QuoteShare — 名言画像を作る</title>
+  <meta name="description" content="セリフを作成して PNG 画像としてダウンロードできる学習用フロントエンドアプリ" />
+  <title>QuoteShare — セリフ画像を作る</title>
   <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
@@ -22,35 +22,26 @@
             id="preview-canvas"
             width="1080"
             height="1080"
-            aria-label="名言プレビュー"
+            aria-label="セリフプレビュー"
           ></canvas>
         </div>
 
         <!-- フォーム -->
         <form id="editor-form" class="editor-form" autocomplete="off">
           <label class="field">
-            <span class="field-label">名言</span>
+            <span class="field-label">セリフ</span>
             <textarea
               id="input-text"
               rows="4"
               maxlength="140"
-              placeholder="今日のあなたを支える一言を…"
+              placeholder="今日のあなたを支えるセリフを…"
               required
-            >人生で最も重要なのは、自分が信じる道を歩むことだ。</textarea>
+            >人生で最も重要なのは自分が信じる道を歩むことだ。</textarea>
           </label>
 
           <label class="field">
             <span class="field-label">著者</span>
             <input id="input-author" type="text" maxlength="40" value="匿名" />
-          </label>
-
-          <label class="field">
-            <span class="field-label">テンプレート</span>
-            <select id="input-template">
-              <option value="minimal">ミニマル</option>
-              <option value="serif">セリフ</option>
-              <option value="bold">ボールド</option>
-            </select>
           </label>
 
           <label class="field">

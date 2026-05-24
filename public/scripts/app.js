@@ -4,19 +4,18 @@
 //   - UI イベント
 
 // ============================================================
-// Canvas: 名言画像を描画する (1080 x 1080)
+// Canvas: セリフ画像を描画する (1080 x 1080)
 // ============================================================
 const SIZE = 1080;
 
-const TEMPLATES = {
-  minimal: { font: 'system-ui, sans-serif', weight: '500', quoteScale: 1.0 },
-  serif:   { font: 'Georgia, "Times New Roman", serif', weight: '400', quoteScale: 1.05 },
-  bold:    { font: 'system-ui, sans-serif', weight: '800', quoteScale: 1.1 },
+const QUOTE_STYLE = {
+  font: 'Georgia, "Times New Roman", serif',
+  weight: '400',
+  quoteScale: 1.05,
 };
 
 function renderQuote(canvas, data) {
   const ctx = canvas.getContext('2d');
-  const tpl = TEMPLATES[data.template] || TEMPLATES.minimal;
 
   // 背景
   ctx.fillStyle = data.bg;
@@ -29,22 +28,22 @@ function renderQuote(canvas, data) {
 
   // 引用符
   ctx.fillStyle = withAlpha(data.fg, 0.2);
-  ctx.font = `700 280px ${tpl.font}`;
+  ctx.font = `700 280px ${QUOTE_STYLE.font}`;
   ctx.textBaseline = 'top';
   ctx.fillText('\u201C', 120, 100);
 
   // 本文(折り返し + 自動フィット)
   ctx.fillStyle = data.fg;
-  const baseFont = Math.round(64 * tpl.quoteScale);
+  const baseFont = Math.round(64 * QUOTE_STYLE.quoteScale);
   const fontSize = fitFontSize(ctx, data.text, {
-    fontFamily: tpl.font,
-    weight: tpl.weight,
+    fontFamily: QUOTE_STYLE.font,
+    weight: QUOTE_STYLE.weight,
     maxWidth: SIZE - 240,
     maxHeight: SIZE - 480,
     initial: baseFont,
     lineHeight: 1.4,
   });
-  ctx.font = `${tpl.weight} ${fontSize}px ${tpl.font}`;
+  ctx.font = `${QUOTE_STYLE.weight} ${fontSize}px ${QUOTE_STYLE.font}`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'center';
   const lines = wrapText(ctx, data.text, SIZE - 240);
@@ -58,7 +57,7 @@ function renderQuote(canvas, data) {
   // 著者
   if (data.author) {
     ctx.fillStyle = withAlpha(data.fg, 0.75);
-    ctx.font = `500 36px ${tpl.font}`;
+    ctx.font = `500 36px ${QUOTE_STYLE.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText(`— ${data.author}`, SIZE / 2, SIZE - 140);
@@ -66,7 +65,7 @@ function renderQuote(canvas, data) {
 
   // ブランド
   ctx.fillStyle = withAlpha(data.fg, 0.4);
-  ctx.font = `600 22px ${tpl.font}`;
+  ctx.font = `600 22px ${QUOTE_STYLE.font}`;
   ctx.fillText('QuoteShare', SIZE / 2, SIZE - 90);
 }
 
@@ -147,7 +146,6 @@ const els = {
   canvas: $('preview-canvas'),
   text: $('input-text'),
   author: $('input-author'),
-  template: $('input-template'),
   bg: $('input-bg'),
   fg: $('input-fg'),
   btnDownload: $('btn-download'),
@@ -159,7 +157,6 @@ function readForm() {
   return {
     text: els.text.value.trim(),
     author: els.author.value.trim(),
-    template: els.template.value,
     bg: els.bg.value,
     fg: els.fg.value,
   };
